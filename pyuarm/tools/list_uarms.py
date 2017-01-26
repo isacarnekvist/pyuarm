@@ -1,12 +1,13 @@
 from serial.tools import list_ports
 
 UARM_HWID_KEYWORD = "USB VID:PID=0403:6001"
+DEVICE = 0
 
 
 def uarm_ports():
     uarm_ports = []
     for i in list_ports.comports():
-        if i.hwid[0:len(UARM_HWID_KEYWORD)] == UARM_HWID_KEYWORD:
+        if i[-1][0:len(UARM_HWID_KEYWORD)] == UARM_HWID_KEYWORD:
             uarm_ports.append(i[0])
     return uarm_ports
 
@@ -38,7 +39,7 @@ def get_uarm_port_cli():
 
 def get_port_property(port_name):
     for p in list_ports.comports():
-        if p.device == port_name:
+        if p[DEVICE] == port_name:
             return p
     return None
 

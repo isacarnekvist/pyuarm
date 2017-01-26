@@ -11,6 +11,8 @@ if PY3:
 else:
     from Queue import Queue
 
+DEVICE = 0
+
 def get_uarm(logger=None):
     """
     ===============================
@@ -103,7 +105,7 @@ class UArm(object):
         This thread will be finished if serial connection is end.
         :return:
         """
-        while not self.__stop_flag and self.__serial.is_open:
+        while not self.__stop_flag and self.__serial.isOpen():
             try:
                 line = self.__serial.readline()
                 if not line:
@@ -142,7 +144,7 @@ class UArm(object):
         """
         self.__stop_flag = True
         self.__isConnected = False
-        printf("Disconnect from port - {0}...".format(self.port.device))
+        printf("Disconnect from port - {0}...".format(self.port[DEVICE]))
         try:
             self.__serial.close()
         except OSError as e:
@@ -192,8 +194,8 @@ class UArm(object):
         self.__receive_queue = Queue()
         self.__position_queue = Queue()
         try:
-            self.__serial.port = self.port.device
-            printf("Connecting from port - {0}...".format(self.port.device))
+            self.__serial.port = self.port[DEVICE]
+            printf("Connecting from port - {0}...".format(self.port[DEVICE]))
             self.__serial.open()
             self.__receive_thread.start()
             self.__send_thread.start()
@@ -202,7 +204,7 @@ class UArm(object):
             else:
                 threading.Thread(target=self.__connect).start()
         except serial.SerialException as e:
-            raise UArmConnectException(0, "port: {}, Error: {}".format(self.port.device, e.strerror))
+            raise UArmConnectException(0, "port: {}, Error: {}".format(self.port[DEVICE], e.strerror))
 
     def __connect(self):
         start_time = time.time()
